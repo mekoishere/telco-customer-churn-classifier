@@ -6,6 +6,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import make_scorer, recall_score
+import joblib
 
 df = pd.read_csv('WA_Fn-UseC_-Telco-Customer-Churn.csv')
     
@@ -47,10 +48,54 @@ search = GridSearchCV(estimator=model, param_grid=param_grid, scoring=scorer, cv
 # model.fit(X_train, y_train)
 search.fit(X_train, y_train)
 
-print(f"Najlepsze parametry: {search.best_params_}")
+# print(f"Najlepsze parametry: {search.best_params_}")
 
 best_model = search.best_estimator_
 
 y_pred = best_model.predict(X_test)
-print("Wynik modelu:")
-print(classification_report(y_test, y_pred))
+# print("Wynik modelu:")
+# print(classification_report(y_test, y_pred))
+
+joblib.dump(best_model, 'churn_model.pkl')
+joblib.dump(X.columns, 'model_columns.pkl')
+
+
+
+# --------- test dla danego klienta ---------
+test_customer_data = {
+    'gender': 'Female',
+    'SeniorCitizen': 0,
+    'Partner': 'Yes',
+    'Dependents': 'No',
+    'tenure': 20,
+    'PhoneService': 'Yes',
+    'MultipleLines': 'No',
+    'InternetService': 'DSL',
+    'OnlineSecurity': 'Yes',
+    'OnlineBackup': 'No',
+    'DeviceProtection': 'No',
+    'TechSupport': 'No',
+    'StreamingTV': 'No',
+    'StreamingMovies': 'No',
+    'Contract': 'Month-to-month',
+    'PaperlessBilling': 'Yes',
+    'PaymentMethod': 'Electronic check',
+    'MonthlyCharges': 50.0,
+    'TotalCharges': 600.0
+}
+
+df_test = pd.DataFrame([test_customer_data])
+
+df_test = pd.get_dummies(df_test)
+
+df_test = df_test.reindex(columns=X.columns, fill_value=0)
+
+prediction = best_model.predict(df_test)
+probability = best_model.predict_proba(df_test)
+
+if prediction[0] == 1:
+    print(f"Klient odejdzie.")
+    print(f"Pewność modelu: {probability[0][1]*100:.2f}%")
+else:
+    print(f"Klient prawdopodobnie zostanie.")
+    print(f"Pewność modelu: {probability[0][0]*100:.2f}%")
