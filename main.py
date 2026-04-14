@@ -12,6 +12,7 @@ df = pd.read_csv('WA_Fn-UseC_-Telco-Customer-Churn.csv')
     
 df = df.drop('customerID', axis=1)
 df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce').fillna(0)
+df['MonthlyCharges'] = pd.to_numeric(df['MonthlyCharges'], errors='coerce').fillna(0)
 df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})
 df = pd.get_dummies(df, drop_first=True)
     
@@ -53,8 +54,8 @@ search.fit(X_train, y_train)
 best_model = search.best_estimator_
 
 y_pred = best_model.predict(X_test)
-# print("Wynik modelu:")
-# print(classification_report(y_test, y_pred))
+print("Wynik modelu:")
+print(classification_report(y_test, y_pred))
 
 joblib.dump(best_model, 'churn_model.pkl')
 joblib.dump(X.columns, 'model_columns.pkl')
@@ -62,40 +63,40 @@ joblib.dump(X.columns, 'model_columns.pkl')
 
 
 # --------- test dla danego klienta ---------
-test_customer_data = {
-    'gender': 'Female',
-    'SeniorCitizen': 0,
-    'Partner': 'Yes',
-    'Dependents': 'No',
-    'tenure': 20,
-    'PhoneService': 'Yes',
-    'MultipleLines': 'No',
-    'InternetService': 'DSL',
-    'OnlineSecurity': 'Yes',
-    'OnlineBackup': 'No',
-    'DeviceProtection': 'No',
-    'TechSupport': 'No',
-    'StreamingTV': 'No',
-    'StreamingMovies': 'No',
-    'Contract': 'Month-to-month',
-    'PaperlessBilling': 'Yes',
-    'PaymentMethod': 'Electronic check',
-    'MonthlyCharges': 50.0,
-    'TotalCharges': 600.0
-}
+# test_customer_data = {
+#     'gender': 'Female',
+#     'SeniorCitizen': 0,
+#     'Partner': 'Yes',
+#     'Dependents': 'No',
+#     'tenure': 20,
+#     'PhoneService': 'Yes',
+#     'MultipleLines': 'No',
+#     'InternetService': 'DSL',
+#     'OnlineSecurity': 'Yes',
+#     'OnlineBackup': 'No',
+#     'DeviceProtection': 'No',
+#     'TechSupport': 'No',
+#     'StreamingTV': 'No',
+#     'StreamingMovies': 'No',
+#     'Contract': 'Month-to-month',
+#     'PaperlessBilling': 'Yes',
+#     'PaymentMethod': 'Electronic check',
+#     'MonthlyCharges': 50.0,
+#     'TotalCharges': 600.0
+# }
 
-df_test = pd.DataFrame([test_customer_data])
+# df_test = pd.DataFrame([test_customer_data])
 
-df_test = pd.get_dummies(df_test)
+# df_test = pd.get_dummies(df_test)
 
-df_test = df_test.reindex(columns=X.columns, fill_value=0)
+# df_test = df_test.reindex(columns=X.columns, fill_value=0)
 
-prediction = best_model.predict(df_test)
-probability = best_model.predict_proba(df_test)
+# prediction = best_model.predict(df_test)
+# probability = best_model.predict_proba(df_test)
 
-if prediction[0] == 1:
-    print(f"Klient odejdzie.")
-    print(f"Pewność modelu: {probability[0][1]*100:.2f}%")
-else:
-    print(f"Klient prawdopodobnie zostanie.")
-    print(f"Pewność modelu: {probability[0][0]*100:.2f}%")
+# if prediction[0] == 1:
+#     print(f"Klient odejdzie.")
+#     print(f"Pewność modelu: {probability[0][1]*100:.2f}%")
+# else:
+#     print(f"Klient prawdopodobnie zostanie.")
+#     print(f"Pewność modelu: {probability[0][0]*100:.2f}%")
