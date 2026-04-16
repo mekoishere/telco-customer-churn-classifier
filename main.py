@@ -15,10 +15,12 @@ df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce').fillna(0
 df['MonthlyCharges'] = pd.to_numeric(df['MonthlyCharges'], errors='coerce').fillna(0)
 df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})
 df = pd.get_dummies(df, drop_first=True)
-    
+
 X = df.drop('Churn', axis=1)
 y = df['Churn']
-    
+
+print(df['Churn'].value_counts())
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # dużo więcej klientów zostaje niż odchodzi więc trzeba znaleźć model który sobie z tym poradzi
